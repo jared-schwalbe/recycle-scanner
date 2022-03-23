@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    backgroundColor: '#f4f4f4',
+    backgroundColor: '#f7f7f7',
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'center',

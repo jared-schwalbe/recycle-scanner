@@ -6,9 +6,11 @@ import * as mobilenet from '@tensorflow-models/mobilenet';
 
 import { ModelProvider } from './contexts/ModelContext';
 import Navigation from './navigation/Navigation';
+import useCachedResources from './hooks/useCachedResources';
 
 export default function App() {
   const [model, setModel] = useState();
+  const isLoadingComplete = useCachedResources();
 
   useEffect(() => {
     (async () => {
@@ -16,6 +18,10 @@ export default function App() {
       setModel(await mobilenet.load({ version: 1, alpha: 0.5 }));
     })();
   }, []);
+
+  if (!isLoadingComplete) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
