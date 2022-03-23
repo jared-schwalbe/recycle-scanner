@@ -3,6 +3,7 @@
     "name": "images-test",
     "slug": "images-test",
     "version": "1.0.0",
+    "scheme": "myapp",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
