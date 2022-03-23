@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { StyleSheet, Text, View, Image, ActivityIndicator, Pressable, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera } from 'expo-camera';
@@ -6,6 +6,7 @@ import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from '@tensorflow-models/mobilenet';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 
+import { ModelContext } from '../contexts/ModelContext';
 import closeIcon from '../assets/close.png';
 
 const TensorCamera = cameraWithTensors(Camera);
@@ -20,10 +21,11 @@ const CAMERA_SCREEN_OFFSET = (CAMERA_SCREEN_WIDTH - WINDOW_WIDTH) / 2;
 const RUN_EVERY_N_FRAMES = 90;
 
 export default function ScanScreen({ navigation }) {
-  const [hasCameraPermission, setHasCameraPermission] = useState();
-  const [mobilenetModel, setMobilenetModel] = useState();
   const [prediction, setPrediction] = useState();
+  const [hasCameraPermission, setHasCameraPermission] = useState();
+
   const frame = useRef(0);
+  const mobilenetModel = useContext(ModelContext);
 
   const handleCameraStream = images => {
     const loop = async () => {
@@ -47,34 +49,30 @@ export default function ScanScreen({ navigation }) {
   }
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        const { status } = await Camera.requestCameraPermissionsAsync();
+    Camera.requestCameraPermissionsAsync()
+      .then(({ status }) => {
         setHasCameraPermission(status === 'granted');
-        await tf.ready();
-        setMobilenetModel(await mobilenet.load({ version: 1, alpha: 0.5 }));
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    init();
+      });
   }, []);
 
   if (!hasCameraPermission) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Please provide access to your camera</Text>
+        <Text>Please provide access to your camera.</Text>
       </SafeAreaView>
     );
   }
 
-  if (!mobilenetModel){
+  if (!mobilenetModel) {
     return (
       <SafeAreaView style={styles.container}>
         <Camera
           style={styles.camera}
           type={Camera.Constants.Type.back}
         />
+        <Pressable onPress={navigation.goBack} style={styles.close}>
+          <Image source={closeIcon} style={styles.closeIcon} />
+        </Pressable>
         <ActivityIndicator size="large" style={styles.loading} />
       </SafeAreaView>
     );
@@ -109,14 +107,14 @@ export default function ScanScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   close: {
-    left: 35,
+    left: 36,
     position: 'absolute',
-    top: 65,
+    top: 72,
     zIndex: 20,
   },
   closeIcon: {
-    height: 25,
-    width: 25,
+    height: 28,
+    width: 28,
   },
   camera: {
     height: CAMERA_SCREEN_HEIGHT,
