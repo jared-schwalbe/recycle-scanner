@@ -16,10 +16,24 @@ import locationIcon from '../assets/location.png';
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
 
+const EmptyScreen = () => null;
+
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="Root"
+        component={BottomTabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ScanScreen"
+        component={ScanScreen}
+        options={{
+          presentation: 'fullScreenModal',
+          headerShown: false,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -27,6 +41,7 @@ function RootNavigator() {
 function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
+      backBehavior="history"
       initialRouteName="HomeTab"
       screenOptions={{
         headerShown: false,
@@ -48,10 +63,15 @@ function BottomTabNavigator() {
       />
       <BottomTab.Screen
         name="ScanTab"
-        component={ScanScreen}
+        component={EmptyScreen}
         options={() => ({
-          tabBarStyle: { display: 'none' },
           tabBarIcon: () => <Image source={scanIcon} style={styles.scanIcon} />,
+        })}
+        listeners={({ navigation }) => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('ScanScreen');
+          },
         })}
       />
       <BottomTab.Screen

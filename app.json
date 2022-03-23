@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "images-test",
-    "slug": "images-test",
+    "name": "recycle-scanner",
+    "slug": "recycle-scanner",
     "version": "1.0.0",
     "scheme": "myapp",
     "orientation": "portrait",

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, Platform, Dimensions } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, Image, ActivityIndicator, Pressable, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera } from 'expo-camera';
 import * as tf from "@tensorflow/tfjs";
 import * as mobilenet from '@tensorflow-models/mobilenet';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+
+import closeIcon from '../assets/close.png';
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -15,19 +17,18 @@ const CAMERA_TEXTURE_WIDTH = 1080;
 const CAMERA_SCREEN_HEIGHT = WINDOW_HEIGHT;
 const CAMERA_SCREEN_WIDTH = WINDOW_HEIGHT * (CAMERA_TEXTURE_WIDTH / CAMERA_TEXTURE_HEIGHT);
 const CAMERA_SCREEN_OFFSET = (CAMERA_SCREEN_WIDTH - WINDOW_WIDTH) / 2;
-
-let frame = 0;
 const RUN_EVERY_N_FRAMES = 90;
 
-export default function ScanScreen() {
+export default function ScanScreen({ navigation }) {
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [mobilenetModel, setMobilenetModel] = useState();
   const [prediction, setPrediction] = useState();
+  const frame = useRef(0);
 
   const handleCameraStream = images => {
     const loop = async () => {
       if (mobilenetModel) {
-        if (frame % RUN_EVERY_N_FRAMES === 0){
+        if (frame.current % RUN_EVERY_N_FRAMES === 0){
           const nextImageTensor = images.next().value;
           if (nextImageTensor){
             const results = await mobilenetModel.classify(nextImageTensor);
@@ -37,8 +38,8 @@ export default function ScanScreen() {
             tf.dispose([nextImageTensor]);
           }
         }
-        frame += 1;
-        frame = frame % RUN_EVERY_N_FRAMES;
+        frame.current += 1;
+        frame.current %= RUN_EVERY_N_FRAMES;
       }
       requestAnimationFrame(loop);
     }
@@ -46,22 +47,23 @@ export default function ScanScreen() {
   }
 
   useEffect(() => {
-    (async () => {
+    const init = async () => {
       try {
         const { status } = await Camera.requestCameraPermissionsAsync();
         setHasCameraPermission(status === 'granted');
         await tf.ready();
-        setMobilenetModel(await mobilenet.load({ version: 1, alpha: 0.25 }));
+        setMobilenetModel(await mobilenet.load({ version: 1, alpha: 0.5 }));
       } catch (e) {
         console.log(e);
       }
-    })();
+    };
+    init();
   }, []);
 
   if (!hasCameraPermission) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>No access to camera</Text>
+        <Text>Please provide access to your camera</Text>
       </SafeAreaView>
     );
   }
@@ -69,7 +71,11 @@ export default function ScanScreen() {
   if (!mobilenetModel){
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Loading the model...</Text>
+        <Camera
+          style={styles.camera}
+          type={Camera.Constants.Type.back}
+        />
+        <ActivityIndicator size="large" style={styles.loading} />
       </SafeAreaView>
     );
   }
@@ -87,6 +93,9 @@ export default function ScanScreen() {
         style={styles.camera}
         type={Camera.Constants.Type.back}
       />
+      <Pressable onPress={navigation.goBack} style={styles.close}>
+        <Image source={closeIcon} style={styles.closeIcon} />
+      </Pressable>
       {Boolean(prediction) && (
         <View style={styles.prediction}>
           <Text style={{ fontSize: 16 }}>
@@ -99,6 +108,16 @@ export default function ScanScreen() {
 }
 
 const styles = StyleSheet.create({
+  close: {
+    left: 35,
+    position: 'absolute',
+    top: 65,
+    zIndex: 20,
+  },
+  closeIcon: {
+    height: 25,
+    width: 25,
+  },
   camera: {
     height: CAMERA_SCREEN_HEIGHT,
     marginLeft: CAMERA_SCREEN_OFFSET,
@@ -113,6 +132,10 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     width: '100%',
+  },
+  loading: {
+    position: 'absolute',
+    zIndex: 20,
   },
   prediction: {
     alignItems: 'center',
