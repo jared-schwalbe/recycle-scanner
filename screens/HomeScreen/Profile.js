@@ -18,8 +18,6 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 30,
-    marginLeft: 30,
   },
   profileIcon: {
     height: 32,
@@ -28,5 +26,5 @@ const styles = StyleSheet.create({
   },
   points: {
     fontSize: 13,
-  }
+  },
 });

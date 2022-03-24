@@ -48,7 +48,7 @@ function BottomTabNavigator() {
         tabBarShowLabel: false,
         tabBarShowIcon: true,
         tabBarStyle: {
-          backgroundColor: '#f7f7f7',
+          backgroundColor: '#f4f4f4',
           borderTopWidth: 0,
           height: 120,
           marginBottom: 0,

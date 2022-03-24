@@ -12,7 +12,7 @@ export default function LocationScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#f4f4f4',
     flex: 1,
     justifyContent: 'center',
   },

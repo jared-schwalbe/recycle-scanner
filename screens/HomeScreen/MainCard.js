@@ -16,12 +16,18 @@ export default function MainCard({ points }) {
 
 const styles = StyleSheet.create({
   card: {
-    marginTop: 20,
-    marginLeft: 30,
+    backgroundColor: '#c6e8e5',
     borderRadius: 10,
+    marginTop: 20,
     height: 300,
-    backgroundColor: '#c0e5e2',
     width: WINDOW_WIDTH - 60,
+  },
+  image: {
+    position: 'absolute',
+    bottom: 15,
+    right: 2,
+    height: 200,
+    width: 200,
   },
   text: {
     fontFamily: 'RobotoSlab',
@@ -30,11 +36,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: '55%',
   },
-  image: {
-    position: 'absolute',
-    bottom: 15,
-    right: 2,
-    height: 200,
-    width: 200,
-  }
 });

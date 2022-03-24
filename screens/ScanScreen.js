@@ -21,11 +21,11 @@ const CAMERA_SCREEN_OFFSET = (CAMERA_SCREEN_WIDTH - WINDOW_WIDTH) / 2;
 const RUN_EVERY_N_FRAMES = 90;
 
 export default function ScanScreen({ navigation }) {
-  const [prediction, setPrediction] = useState();
   const [hasCameraPermission, setHasCameraPermission] = useState();
-
-  const frame = useRef(0);
+  const [prediction, setPrediction] = useState();
   const mobilenetModel = useContext(ModelContext);
+  const frame = useRef(0);
+  const touchY = useRef();
 
   const handleCameraStream = images => {
     const loop = async () => {
@@ -79,7 +79,15 @@ export default function ScanScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      onTouchStart={e=> touchY.current = e.nativeEvent.pageY}
+      onTouchEnd={e => {
+        if (e.nativeEvent.pageY - touchY.current > 30) {
+          navigation.goBack();
+        }
+      }}
+      style={styles.container}
+    >
       <TensorCamera 
         autorender
         cameraTextureHeight={CAMERA_TEXTURE_HEIGHT}
@@ -113,8 +121,8 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   closeIcon: {
-    height: 28,
-    width: 28,
+    height: 25,
+    width: 25,
   },
   camera: {
     height: CAMERA_SCREEN_HEIGHT,
@@ -125,7 +133,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    backgroundColor: '#f7f7f7',
+    backgroundColor: '#f4f4f4',
     flexDirection: 'column',
     height: '100%',
     justifyContent: 'center',
