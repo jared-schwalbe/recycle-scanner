@@ -12,7 +12,7 @@ export default function Modal({ closeModal, children, title }) {
   useEffect(() => {
     Animated.timing(fade, {
       toValue: 1,
-      duration: 250,
+      duration: 200,
       useNativeDriver: true
     }).start();
   }, []);

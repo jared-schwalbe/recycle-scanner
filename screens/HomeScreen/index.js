@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Image,StyleSheet } from 'react-native';
+import { Text, Image, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ModalProvider } from '../../contexts/ModalContext';
@@ -12,8 +12,10 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ModalProvider>
         <Profile points="4,800" />
-        <MainCard />
-        <RecyclableList />
+        <ScrollView>
+          <MainCard />
+          <RecyclableList />
+        </ScrollView>
       </ModalProvider>
     </SafeAreaView>
   );
