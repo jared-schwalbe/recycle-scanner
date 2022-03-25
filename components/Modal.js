@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     top: -12,
   },
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
     borderRadius: 10,
     height: WINDOW_WIDTH - 130,
     width: WINDOW_WIDTH - 130,

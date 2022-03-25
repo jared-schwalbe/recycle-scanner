@@ -12,7 +12,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ModalProvider>
         <Profile points="4,800" />
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <MainCard />
           <RecyclableList />
         </ScrollView>

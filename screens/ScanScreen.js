@@ -21,6 +21,7 @@ const CAMERA_SCREEN_OFFSET = (CAMERA_SCREEN_WIDTH - WINDOW_WIDTH) / 2;
 const RUN_EVERY_N_FRAMES = 90;
 
 export default function ScanScreen({ navigation }) {
+  const [loading, setLoading] = useState(true);
   const [hasCameraPermission, setHasCameraPermission] = useState();
   const [prediction, setPrediction] = useState();
   const mobilenetModel = useContext(ModelContext);
@@ -28,6 +29,8 @@ export default function ScanScreen({ navigation }) {
   const touchY = useRef();
 
   const handleCameraStream = images => {
+    setTimeout(() => setLoading(false), 2000);
+
     const loop = async () => {
       if (mobilenetModel) {
         if (frame.current % RUN_EVERY_N_FRAMES === 0){
@@ -45,6 +48,7 @@ export default function ScanScreen({ navigation }) {
       }
       requestAnimationFrame(loop);
     }
+
     loop();
   }
 
@@ -65,27 +69,26 @@ export default function ScanScreen({ navigation }) {
 
   if (!mobilenetModel) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Camera
-          style={styles.camera}
-          type={Camera.Constants.Type.back}
-        />
+      <SafeAreaView style={[styles.container, { backgroundColor: 'black' }]}>
         <Pressable onPress={navigation.goBack} style={styles.close}>
           <Image source={closeIcon} style={styles.closeIcon} />
         </Pressable>
-        <ActivityIndicator size="large" style={styles.loading} />
+        <ActivityIndicator color="white" size="large" style={styles.loading} />
       </SafeAreaView>
     );
   }
 
+  const onTouchStart = e => touchY.current = e.nativeEvent.pageY;
+  const onTouchEnd = e => {
+    if (e.nativeEvent.pageY - touchY.current > 30) {
+      navigation.goBack();
+    }
+  };
+
   return (
     <SafeAreaView
-      onTouchStart={e=> touchY.current = e.nativeEvent.pageY}
-      onTouchEnd={e => {
-        if (e.nativeEvent.pageY - touchY.current > 30) {
-          navigation.goBack();
-        }
-      }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
       style={styles.container}
     >
       <TensorCamera 
@@ -102,7 +105,10 @@ export default function ScanScreen({ navigation }) {
       <Pressable onPress={navigation.goBack} style={styles.close}>
         <Image source={closeIcon} style={styles.closeIcon} />
       </Pressable>
-      {Boolean(prediction) && (
+      {loading && (
+        <ActivityIndicator color="white" size="large" style={styles.loading} />
+      )}
+      {!loading && (
         <View style={styles.prediction}>
           <Text style={{ fontSize: 16 }}>
             Is this a <Text style={{ fontWeight: 'bold' }}>{prediction}</Text>?
@@ -145,7 +151,7 @@ const styles = StyleSheet.create({
   },
   prediction: {
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'white',
     borderRadius: 10,
     bottom: 60,
     flexDirection: 'row',

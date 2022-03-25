@@ -4,7 +4,6 @@ import { View, Text, StyleSheet } from 'react-native';
 export default function LocationScreen() {
   return (
     <View style={styles.container}>
-      <Text>Location screen</Text>
     </View>
   );
 }
